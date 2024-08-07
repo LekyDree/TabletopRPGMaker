@@ -1,4 +1,4 @@
-.text-area {
+#text-area-label {
      -fx-focus-color: transparent;
      -fx-faint-focus-color: transparent;
      -fx-background-color: transparent;
@@ -6,6 +6,6 @@
      -fx-text-fill: black
  }
 
- .text-area .content {
+ #text-area-label .content {
      -fx-background-color: transparent;
  }

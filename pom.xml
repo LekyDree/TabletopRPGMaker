@@ -85,6 +85,16 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.graalvm.js</groupId>
+            <artifactId>js</artifactId>
+            <version>22.3.0</version> <!-- or the latest version -->
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.truffle</groupId>
+            <artifactId>truffle-api</artifactId>
+            <version>22.3.0</version> <!-- or the latest version -->
+        </dependency>
     </dependencies>
 
     <build>

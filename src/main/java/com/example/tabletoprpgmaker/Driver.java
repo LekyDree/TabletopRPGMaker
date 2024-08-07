@@ -15,6 +15,8 @@ public class Driver extends Application {
     @Override
     public void start(Stage window) {
 
+        addTestVars();
+
         VBox createBox = getCreateBox();
         VBox addBox = getAddBox();
         VBox bindBox = getBindBox();
@@ -26,23 +28,49 @@ public class Driver extends Application {
         VBox printBox = new VBox(printInput, printButton);
         printBox.setSpacing(10);
 
-        TextArea textArea = new TextArea("This is a label-like text area. You can click and drag to highlight this text.");
-        textArea.setWrapText(true);
-        textArea.setEditable(false);
-        Button buttona = new Button("Get Selected Text");
-        buttona.setOnAction(e -> {
-            String selectedText = textArea.getSelectedText();
-            textArea.selectRange(0,0);
-            System.out.println("Selected text: " + selectedText);
-        });
+        TextArea textAreaLabel = new TextArea("This is a label-like text area. You can click and drag to highlight this text.");
+        textAreaLabel.setWrapText(true);
+        textAreaLabel.setEditable(false);
+        textAreaLabel.setId("text-area-label");
 
-        VBox layout = new VBox(createBox, addBox, bindBox, printBox, textArea, buttona);
+        VBox layout = new VBox(createBox, addBox, bindBox, printBox, textAreaLabel);
         layout.setSpacing(10);
         Scene scene = new Scene(layout, 400, 600);
         scene.getStylesheets().add(this.getClass().getResource("main.css").toExternalForm());
         window.setScene(scene);
         window.setTitle("JavaFX App");
         window.show();
+    }
+
+    //Temporary method for testing code. Need to replace with proper unit testing
+    private void addTestVars() {
+        Component c1 = new Component("Life");
+        Component c2 = new Component("Con");
+        components.put("Life", c1);
+        components.put("Con", c2);
+        c1.addProperty("Health", "20", Double.class, true);
+        c1.addProperty("Appearance", "Fine", String.class, true);
+        c1.addProperty("Weak", "false", Boolean.class, true);
+        c2.addProperty("Score", "10", Double.class, true);
+        c2.addProperty("Tough", "true", Boolean.class, true);
+        Component.addListenerToProperty("if (tough == true) {health = score * 5} else {health = score * 2}",
+                new ComponentPropertyPair(c1, "Health"),
+                new ComponentPropertyPair(c2, "Score"),
+                new ComponentPropertyPair(c2, "Tough"));
+        Component.addListenerToProperty("""
+                if (health <= 10) {
+                    appearance = "frail"
+                } else if (health >= 30) {
+                    appearance = "strong"
+                } else {
+                    appearance = "fine"
+                }
+                """,
+                new ComponentPropertyPair(c1, "Appearance"),
+                new ComponentPropertyPair(c1, "Health"));
+        Component.addListenerToProperty("weak = appearance == \"frail\"",
+                new ComponentPropertyPair(c1, "Weak"),
+                new ComponentPropertyPair(c1, "Appearance"));
     }
 
     private VBox getCreateBox() {
@@ -107,22 +135,23 @@ public class Driver extends Application {
         componentInput2.setMaxWidth(200);
         TextField propNameInput2 = new TextField();
         propNameInput2.setMaxWidth(200);
+        TextArea listenerTextArea = new TextArea();
 
         Button bindButton = new Button("Bind");
         bindButton.setOnAction(e -> {
+            String scriptText = listenerTextArea.getText();
+
             Component component1 = components.get(componentInput1.getText());
             Component component2 = components.get(componentInput2.getText());
-            String changingPropertyName = propNameInput2.getText();
-            component1.addListenerToProperty(propNameInput1.getText(), (v, oldValue, newValue) -> {
-                component2.setPropertyValue(changingPropertyName, "" + (double) newValue * 5);
-            });
+            Component.addListenerToProperty(scriptText, new ComponentPropertyPair(component2, propNameInput2.getText()), new ComponentPropertyPair(component1, propNameInput1.getText()));
 
             componentInput1.clear();
             propNameInput1.clear();
             componentInput2.clear();
             propNameInput2.clear();
+            listenerTextArea.clear();
         });
-        VBox bindBox = new VBox(componentInput1, propNameInput1, componentInput2, propNameInput2, bindButton);
+        VBox bindBox = new VBox(componentInput1, propNameInput1, componentInput2, propNameInput2, listenerTextArea, bindButton);
         bindBox.setSpacing(10);
         return bindBox;
     }
